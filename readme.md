@@ -31,8 +31,9 @@ def getCoins2(self):
 ```
 
 **Данные, на которых наблюдается некорректное поведение**  
-Если `self.__mode == VendingMachine.Mode.OPERATION`, то при любых остальных входных данных при вызове функции `getCoins2(self)`, вызовется необработанное исключение.  
-Шаги для воспроизведения:
+Если `self.__mode == VendingMachine.Mode.OPERATION`, то при любых остальных входных данных при вызове функции `getCoins2(self)`, вызовется необработанное исключение.
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 machine.exitAdminMode() # Удостоверяемся, что автомат находится в рабочем режиме.
@@ -76,7 +77,8 @@ def putCoin1(self):
 
 **Данные, на которых наблюдается некорректное поведение**  
 Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins2 != self.__maxc2`, то метод не увеличит количество 1-го вида монет в автомате, хотя пункт o. требует этого. Это проверяется методом `getCoins1()`, который пункт f. требует возвращать количество монет 1-го вида вне режима отладки.
-Шаги для воспроизведения:
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 print(machine.getCoins1(), end=" ")
@@ -120,8 +122,9 @@ def getCoins2(self):
 ```
 
 **Данные, на которых наблюдается некорректное поведение**  
-Если `self.__mode == VendingMachine.Mode.OPERATION`, то метод вернет количество монет 1-го вида, хотя пункт g. требует вернуть `0`.  
-Шаги для воспроизведения:
+Если `self.__mode == VendingMachine.Mode.OPERATION`, то метод вернет количество монет 1-го вида, хотя пункт g. требует вернуть `0`.
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 # Кладя монету 1-го вида в автомат, мы удостоверяемся, что монет 1-го вида не может быть ноль,
@@ -169,7 +172,8 @@ def enterAdminMode(self, code: int):
 
 **Данные, на которых наблюдается некорректное поведение**  
 Если `self.__balance != 0 and code != self.__id`, то метод вернет `VendingMachine.Response.UNSUITABLE_CHANGE`, хотя пункт i. требует вернуть `VendingMachine.Response.ILLEGAL_OPERATION` сначала, при несовпадении кодов.
-Шаги для воспроизведения:
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 # Добавляем монету в баланс, удостоверяясь, что баланс точно ненулевой.
@@ -227,7 +231,8 @@ def enterAdminMode(self, code: int):
 
 **Данные, на которых наблюдается некорректное поведение**  
 Если `code == self.__id and self.__balance != 0`, то метод вернет `VendingMachine.Response.UNSUITABLE_CHANGE`, хотя пункт i. требует вернуть `VendingMachine.Response.CANNOT_PERFORM` при совпадении кодов и ненулевом балансе.
-Шаги для воспроизведения:
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 # Удостоверяемся, что баланс ненулевой.
@@ -275,7 +280,8 @@ def fillProducts(self):
 
 **Данные, на которых наблюдается некорректное поведение**  
 Метод возвращает `VendingMachine.Response.OK` при любом режиме автомата, хотя пункт j. требует вернуть `VendingMachine.Response.ILLEGAL_OPERATION` в режиме отличном от отладки.
-Шаги для воспроизведения:
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 # Удостоверимся, что автомат не в режиме отладки.
@@ -323,8 +329,9 @@ def fillProducts(self):
 ```
 
 **Данные, на которых наблюдается некорректное поведение**  
-Если `self.__mode == VendingMachine.Mode.ADMINISTERING`, то метод `fillProducts()` увеличит количество продуктов 1-го типа до максимального количества продуктов 2-го типа, хотя пункт j. требует увеличить количество продуктов 1-го типа до максимального количества продуктов 1-го типа. 
-Шаги для воспроизведения:
+Если `self.__mode == VendingMachine.Mode.ADMINISTERING`, то метод `fillProducts()` увеличит количество продуктов 1-го типа до максимального количества продуктов 2-го типа, хотя пункт j. требует увеличить количество продуктов 1-го типа до максимального количества продуктов 1-го типа.
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 # Зайдем в режим отладки.
@@ -390,7 +397,8 @@ def giveProduct1(self, number: int):
 
 **Данные, на которых наблюдается некорректное поведение**  
 Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number > 0 and number == self.__max1`, то метод `giveProduct1()` вернет `VendingMachine.Response.INVALID_PARAM`, хотя пункт r. требует возвращать `VendingMachine.Response.INVALID_PARAM` только если `number` \<= 0 предметов или больше максимума предметов 1-го вида (т. е. выполнение метода должно продолжаться).
-Шаги для воспроизведения:
+
+**Шаги для воспроизведения**
 ```python
 machine = VendingMachine()
 # Зайдем в режим отладки.
@@ -425,3 +433,61 @@ def giveProduct1(self, number: int):
 
 **Замечание**
 Это и есть тот баг, о котором говорится в ошибке #7.
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #9
+
+**Код до исправления**  
+```python
+def fillCoins(self, c1: int, c2: int):
+    if self.__mode == VendingMachine.Mode.OPERATION:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if c1 <= 0 or c2 > self.__maxc1:
+        return VendingMachine.Response.INVALID_PARAM
+    if c1 <= 0 or c2 > self.__maxc2:
+        return VendingMachine.Response.INVALID_PARAM
+    self.__coins1 = c1
+    self.__coins2 = c2
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.OPERATION and c1 >= 0 and c2 <= 0`, то метод `fillCoins()` возвратит `VendingMachine.Response.OK`, хотя пункт k. требует возвратить `VendingMachine.Response.INVALID_PARAM` при попытке задать `c2` больше максимума монет 2 вида.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Заходим в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Ожидается, что возвратится INVALID_PARAM, так как второй аргумент неположителен.
+print(machine.fillCoins(1, -1) == VendingMachine.Response.INVALID_PARAM)
+```
+
+**Полученное значение**  
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def fillCoins(self, c1: int, c2: int):
+    if self.__mode == VendingMachine.Mode.OPERATION:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if c1 <= 0 or c2 > self.__maxc1:
+        return VendingMachine.Response.INVALID_PARAM
+    if c2 <= 0 or c2 > self.__maxc2:
+        return VendingMachine.Response.INVALID_PARAM
+    self.__coins1 = c1
+    self.__coins2 = c2
+    return VendingMachine.Response.OK
+```
