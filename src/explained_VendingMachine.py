@@ -81,7 +81,7 @@ class VendingMachine:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if c1 <= 0 or c2 > self.__maxc1:
             return VendingMachine.Response.INVALID_PARAM
-        if c1 <= 0 or c2 > self.__maxc2:
+        if c2 <= 0 or c2 > self.__maxc2: # [fixed].
             return VendingMachine.Response.INVALID_PARAM
         self.__coins1 = c1
         self.__coins2 = c2
