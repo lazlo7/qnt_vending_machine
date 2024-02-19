@@ -1,0 +1,8 @@
+[run]
+data_file = ./coverage/.coverage
+
+[report]
+omit = ./src/doub.py
+
+[html]
+directory = ./coverage/
