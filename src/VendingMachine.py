@@ -152,7 +152,7 @@ class VendingMachine:
     def giveProduct1(self, number: int):
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
-        if number <= 0 or number >= self.__max1:
+        if number <= 0 or number > self.__max1:
             return VendingMachine.Response.INVALID_PARAM
         if number > self.__num1:
             return VendingMachine.Response.INSUFFICIENT_PRODUCT

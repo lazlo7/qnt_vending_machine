@@ -363,6 +363,7 @@ def fillProducts(self):
 **Замечание**
 Данное воспроизведение строится только на двух условностях: что `max1` больше нуля (что логично и подразумевается требованиями, иначе мы падаем на assert'е) и что в `giveProduct1()` мы не попадаем под баг, который там есть и связан с воспроизведением. На самом деле, воспроизведение находит баг в fillProducts() в независимости от того, исправлен ли этот баг в `giveProduct1()` или нет. Таким образом, в данном воспроизведении мы только полагаемся на корректность методов `getNumberOfProduct1()`, `exitAdminMode()` (в которых не найдено ошибок), `enterAdminMode()` (в котором исправлены все найденные ошибки), `fillProducts()` (ошибку в котором мы и обозреваем) и `giveProduct1()` (под ошибку которого воспроизведение не попадает, об этом далее).  
 P. S. В ходе исследования было обнаружено, что если бы мы сначала рассматривали ошибку в методе `giveProduct1()`, то можно было бы вычислить "эталонный" `max1` (который на самом деле не является эталонным) только и полагаясь на `giveProduct1()`, и на этом как-то построить воспроизведение, однако дальнейшие рассуждения показали, что тогда бы пришлось полагаться на метод `fillProducts()`, под ошибку которого мы обязательно попадаем.  
+Далее будем условиться, что эталонный `max1` больше нуля.
 
 
 
@@ -377,23 +378,50 @@ P. S. В ходе исследования было обнаружено, что
 
 **Код до исправления**  
 ```python
-
+def giveProduct1(self, number: int):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if number <= 0 or number >= self.__max1:
+        return VendingMachine.Response.INVALID_PARAM
+    if number > self.__num1:
+        return VendingMachine.Response.INSUFFICIENT_PRODUCT
+    ...
 ```
 
 **Данные, на которых наблюдается некорректное поведение**  
-
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number > 0 and number == self.__max1`, то метод `giveProduct1()` вернет `VendingMachine.Response.INVALID_PARAM`, хотя пункт r. требует возвращать `VendingMachine.Response.INVALID_PARAM` только если `number` \<= 0 предметов или больше максимума предметов 1-го вида (т. е. выполнение метода должно продолжаться).
 Шаги для воспроизведения:
 ```python
-
+machine = VendingMachine()
+# Зайдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Вычислим максимальное количество продуктов 1-го типа.
+machine.fillProducts()
+max1 = machine.getNumberOfProduct1()
+# Выйдем из режима отладки.
+machine.exitAdminMode()
+# Попытаемся купить все продукты 1-го типа.
+# Ожидается, что не возвратится VendingMachine.Response.INVALID_PARAM.
+print(machine.giveProduct1(max1) == VendingMachine.Response.INVALID_PARAM)
 ```
 
 **Полученное значение**  
-
+В `stdout` выведется `True`.
 
 **Ожидаемое значение**  
-
+В `stdout` должно вывестись `False`.
 
 **Код после исправления**  
 ```python
-
+def giveProduct1(self, number: int):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if number <= 0 or number > self.__max1:
+        return VendingMachine.Response.INVALID_PARAM
+    if number > self.__num1:
+        return VendingMachine.Response.INSUFFICIENT_PRODUCT
+    ...
 ```
+
+**Замечание**
+Это и есть тот баг, о котором говорится в ошибке #7.
