@@ -72,7 +72,7 @@ class VendingMachine:
     def fillProducts(self):
         if self.__mode != VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
-        self.__num1 = self.__max2
+        self.__num1 = self.__max1
         self.__num2 = self.__max2
         return VendingMachine.Response.OK
 
