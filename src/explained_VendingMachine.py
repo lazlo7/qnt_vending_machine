@@ -79,7 +79,7 @@ class VendingMachine:
     def fillCoins(self, c1: int, c2: int):
         if self.__mode == VendingMachine.Mode.OPERATION:
             return VendingMachine.Response.ILLEGAL_OPERATION
-        if c1 <= 0 or c2 > self.__maxc1:
+        if c1 <= 0 or c1 > self.__maxc1: # [fixed].
             return VendingMachine.Response.INVALID_PARAM
         if c2 <= 0 or c2 > self.__maxc2: # [fixed].
             return VendingMachine.Response.INVALID_PARAM
