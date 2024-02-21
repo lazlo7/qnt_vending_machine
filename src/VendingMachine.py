@@ -101,7 +101,7 @@ class VendingMachine:
     def setPrices(self, p1: int, p2: int):
         if self.__mode == VendingMachine.Mode.OPERATION:
             return VendingMachine.Response.ILLEGAL_OPERATION
-        if p1 <= 0:
+        if p1 <= 0 or p2 <= 0:
             return VendingMachine.Response.INVALID_PARAM
         self.__price1 = p1
         self.__price2 = p2
