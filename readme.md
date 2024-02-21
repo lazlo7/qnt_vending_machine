@@ -557,3 +557,55 @@ def fillCoins(self, c1: int, c2: int):
     self.__coins2 = c2
     return VendingMachine.Response.OK
 ```
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #11
+
+**Код до исправления**  
+```python
+def setPrices(self, p1: int, p2: int):
+    if self.__mode == VendingMachine.Mode.OPERATION:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    self.__price1 = p1
+    self.__price2 = p2
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.OPERATION and p1 <= 0`, то метод `setPrices()` возвратит `VendingMachine.Response.OK`, хотя пункт n. требует возвратить `VendingMachine.Response.INVALID_PARAM` при попытке установки значений цен меньше или равно `0`.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Переход в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Ожидается, что вернется INVALID_PARAM.
+print(machine.setPrices(0, 1) == VendingMachine.Response.INVALID_PARAM)
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def setPrices(self, p1: int, p2: int):
+    if self.__mode == VendingMachine.Mode.OPERATION:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if p1 <= 0:
+        return VendingMachine.Response.INVALID_PARAM
+    self.__price1 = p1
+    self.__price2 = p2
+    return VendingMachine.Response.OK
+```
