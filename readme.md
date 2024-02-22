@@ -663,3 +663,86 @@ def setPrices(self, p1: int, p2: int):
     self.__price2 = p2
     return VendingMachine.Response.OK
 ```
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #13
+
+**Код до исправления**  
+```python
+def putCoin1(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins2 == self.__maxc2:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval2
+    self.__coins1 += 1
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins2 != self.__maxc2`, то баланс пользователя не пополниться на стоимость 1 монеты, хотя этого требует пункт o. 
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Перейдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Результат getCurrentSum() задается выражением:
+# coins1 * coinval1 + coins2 * coinval2
+# Это означает, что мы можем составить систему из 2-ух уравнений
+# и решить ее, чтобы найти эталонные значения coinval1 и coinval2.
+# Составим 1-ое уравнение: v1 + v2 = s1.
+machine.fillCoins(1, 1)
+s1 = machine.getCurrentSum()
+# Составим 2-ое уравнение.
+# Возьмем такие c1 и c2, чтобы 2-ое уравнение не вырождалось в 1-ое:
+# 2v1 + 3v2 = s2.
+machine.fillCoins(2, 3)
+s2 = machine.getCurrentSum()
+# Из 1-ого уравнения следует, что v2 = s1 - v1.
+# Заменив v2 этим равенством и упростив уравнение, получаем:
+# v1 = 3s1 - s2.
+coinval1 = 3*s1 - s2
+# Перейдем в рабочий режим.
+machine.exitAdminMode()
+# Запомним изначальный баланс.
+old_balance = machine.getCurrentBalance()
+# Внесем одну монету 1-го типа на баланс.
+machine.putCoin1()
+# Вычислим новый баланс, получившийся в результате putCoin1().
+new_balance = machine.getCurrentBalance()
+# Таким образом, дельта баланса - используемый в fillCoins() coinval1.
+got_coinval1 = new_balance - old_balance
+# Ожидается, что coinval1 == got_coinval1.
+print(coinval1 == got_coinval1)
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`. 
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def putCoin1(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins2 == self.__maxc2:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval1
+    self.__coins1 += 1
+    return VendingMachine.Response.OK
+```
+
+**Замечание**  
+По сути, воспроизведение полагается только на то, что метод `getCurrentSum()` реализован именно так, а не иначе, хотя именно такая реализация и является самой очевидной. В остальном, за исключением обозреваемого метода `putCoin1()`, все остальные методы в воспроизведении уже полностью исправлены.
