@@ -746,3 +746,67 @@ def putCoin1(self):
 
 **Замечание**  
 По сути, воспроизведение полагается только на то, что метод `getCurrentSum()` реализован именно так, а не иначе, хотя именно такая реализация и является самой очевидной. В остальном, за исключением обозреваемого метода `putCoin1()`, все остальные методы в воспроизведении уже полностью исправлены.
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #14
+
+**Код до исправления**  
+```python
+def putCoin1(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins2 == self.__maxc2:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval1
+    self.__coins1 += 1
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins1 >= self.__maxc1`, то при внесении еще одной монеты 1-го типа в автомат, метод `fillCoins()` не возвратит `VendingMachine.Response.CANNOT_PERFORM`, хотя этого требует пункт o. 
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Перейдем в режим отладки
+machine.enterAdminMode(117345294655382)
+# Вычислим эталонное значение maxc1.
+maxc1 = 0
+while machine.fillCoins(maxc1 + 1, 1) != VendingMachine.Response.INVALID_PARAM:
+    maxc1 += 1
+# Удостоверимся, что в автомат внесено максимальное количество монет 1-го типа.
+machine.fillCoins(maxc1, 1)
+# Перейдем в рабочий режим.
+machine.exitAdminMode()
+# Попытаемся внести монету 1-го типа. Исходя из требований, должно вернуться CANNOT_PERFORM.
+print(machine.putCoin1() == VendingMachine.Response.CANNOT_PERFORM)
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`. 
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def putCoin1(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins1 == self.__maxc1:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval1
+    self.__coins1 += 1
+    return VendingMachine.Response.OK
+```
