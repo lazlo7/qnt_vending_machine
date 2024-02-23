@@ -184,7 +184,7 @@ class VendingMachine:
         self.__num1 -= number
         return VendingMachine.Response.OK
 
-    def giveProduct2(self, number: int):
+    def giveProduct2(self, number: int): # [done].
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if number <= 0 or number > self.__max2: # [fixed].
