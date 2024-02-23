@@ -146,8 +146,8 @@ class VendingMachine:
             # using coinval1 == 1
             return VendingMachine.Response.UNSUITABLE_CHANGE
         # using coinval1 == 1
-        self.__coins1 -= self.__balance // self.__coinval2
-        self.__coins2 -= 1
+        self.__coins2 -= self.__balance // self.__coinval2
+        self.__coins1 -= 1
         self.__balance = 0
         return VendingMachine.Response.OK
 

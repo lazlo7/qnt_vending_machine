@@ -1019,3 +1019,75 @@ def putCoin2(self):
     self.__coins2 += 1
     return VendingMachine.Response.OK
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #18
+
+**Код до исправления**  
+```python
+def returnMoney(self):
+    ...
+    # using coinval1 == 1
+    self.__coins1 -= self.__balance // self.__coinval2
+    self.__coins2 -= 1
+    self.__balance = 0
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__coins1 == 2 and self.__coins2 == 1 and self.__balance == 1`, то метод `returnMoney()` уменьшит количество монет 1-го типа на баланс/2 и 2-то типа на 1, хотя пункт q. требует уменьшить количество монет 2-го типа на баланс/2 и 1-го типа на 1.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Зайдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Пополним автомат монетами: coins1 = 1, coins2 = 1.
+machine.fillCoins(1, 1)
+# Перейдем в рабочий режим.
+machine.exitAdminMode()
+# Внесем одну монету 1-го типа: coins1 = 2, coins2 = 1, balance = 1.
+machine.putCoin1()
+# Попробуем вернуть баланс.
+# Исходя из прошлых тестов, где мы уже нашли эталонные coinval1 и coinval2, 
+# далее будем предполагать, что мы их уже знаем.
+# - mode != ADMINISTERING;
+# - balance != 0;
+# - balance <= coins1 * coinval1 + coins2 * coinval2 <=> 1 <= 2 * 1 + 1 * 2 <=> 1 <= 4;
+# - balance % coinval2 != 0 <=> 1 % 2 != 0 <=> 1 != 0;
+# - coins1 != 0;
+# Итого, мы попадаем в последний случай из требования q.
+# Таким образом, автомат должен вернуть одну монету 1-го типа и 0 монет 2-го типа. 
+machine.returnMoney()
+# Зайдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Ожидается, что выведется 1 1.
+print(machine.getCoins1(), machine.getCoins2())
+```
+
+**Полученное значение**   
+В `stdout` выведется `2 0`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `1 1`.
+
+**Код после исправления**  
+```python
+def returnMoney(self):
+    ...
+    # using coinval1 == 1
+    self.__coins2 -= self.__balance // self.__coinval2
+    self.__coins1 -= 1
+    self.__balance = 0
+    return VendingMachine.Response.OK
+```
