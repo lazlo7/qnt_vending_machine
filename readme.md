@@ -846,16 +846,32 @@ def putCoin2(self):
 
 **Шаги для воспроизведения**
 ```python
-
+machine = VendingMachine()
+# Внесем одну монету 2-го типа.
+machine.putCoin2()
+# Попробуем вернуть деньги.
+# Будем условиться, что мы знаем устройство putCoin2().
+# То есть, мы знаем, что coins1 стало больше на 1 и баланс стал больше на coinval1.
+# Хотя, в теории, coins2 должно стать больше на 1 и баланс должен стать больше на coinval2.
+# Таким образом, ожидается, что не вернется UNSUITABLE_CHANGE (это неверно), 
+# так как есть только одна монета стоимостью 2 у.е., но отдать автомату нужно 1 у.е.
+print(machine.returnMoney() == VendingMachine.Response.UNSUITABLE_CHANGE)
 ```
 
 **Полученное значение**   
-
+В `stdout` выведется `False`.
 
 **Ожидаемое значение**  
-
+В `stdout` должно вывестись `True`.
 
 **Код после исправления**  
 ```python
-
+def putCoin2(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins1 == self.__maxc1:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval1
+    self.__coins2 += 1
+    return VendingMachine.Response.OK
 ```
