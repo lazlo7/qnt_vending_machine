@@ -130,8 +130,8 @@ class VendingMachine:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if self.__balance == 0:
             return VendingMachine.Response.OK
-        if self.__balance > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
-            return VendingMachine.Response.TOO_BIG_CHANGE
+        if self.__balance > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2: 
+            return VendingMachine.Response.TOO_BIG_CHANGE # [unreachable: prove].
         if self.__balance > self.__coins2 * self.__coinval2:
             # using coinval1 == 1
             self.__coins1 -= self.__balance - self.__coins2 * self.__coinval2
@@ -163,7 +163,7 @@ class VendingMachine:
         if res < 0:
             return VendingMachine.Response.INSUFFICIENT_MONEY
         if res > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
-            return VendingMachine.Response.TOO_BIG_CHANGE
+            return VendingMachine.Response.TOO_BIG_CHANGE # [unreachable: prove].
         if res > self.__coins2 * self.__coinval2:
             # using coinval1 == 1
             self.__coins1 -= res - self.__coins2 * self.__coinval2
@@ -196,7 +196,7 @@ class VendingMachine:
         if res < 0:
             return VendingMachine.Response.INSUFFICIENT_MONEY
         if res > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
-            return VendingMachine.Response.INSUFFICIENT_MONEY
+            return VendingMachine.Response.INSUFFICIENT_MONEY # [unreachable: prove].
         if res > self.__coins2 * self.__coinval2:
             # using coinval1 == 1
             self.__coins1 -= res - self.__coins2 * self.__coinval2
@@ -205,7 +205,7 @@ class VendingMachine:
             self.__num2 -= number
             return VendingMachine.Response.OK
         if res % self.__coinval2 == 0:
-            self.__coins2 -= res / self.__coinval2
+            self.__coins2 -= res // self.__coinval2 # [fixed].
             self.__balance = 0
             self.__num2 -= number
             return VendingMachine.Response.OK

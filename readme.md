@@ -1222,3 +1222,70 @@ def giveProduct2(self, number: int):
         return VendingMachine.Response.INSUFFICIENT_PRODUCT
     ...
 ```
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #21
+
+**Код до исправления**  
+```python
+def giveProduct2(self, number: int):
+    ...
+    if res % self.__coinval2 == 0:
+        self.__coins2 -= res / self.__coinval2
+        self.__balance = 0
+        self.__num2 -= number
+        return VendingMachine.Response.OK
+    ...
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number == 1 and res >= 0 and res <= self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2 and res <= self.__coins2 * self.__coinval2 and res % self.__coinval2 == 0`, то метод `giveProduct2()` уменьшит количество монет 2-го типа на `res / self.__coinval2`, что сделает `self.__coins2` нецелым, приводя к тому, что метод `getCoins2()` возвратит число с плавающей точкой, хотя пункт g. требует возвратить целое число.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Зайдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Внесем продукты.
+machine.fillProducts()
+# Установим цены, чтобы избавиться от рассмотрения четной и нечетной цены.
+machine.setPrices(1, 2)
+# Зайдем в рабочий режим.
+machine.exitAdminMode()
+# Внесем четное число у.е. на баланс так, чтобы хватило на 1 продукт 2-го типа.
+while machine.getCurrentBalance() < machine.getPrice2():
+    machine.putCoin2()
+# Купим 1 продукт 2-го типа.
+machine.giveProduct2(1)
+# Зайдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Проверим, что метод getCoins2() возвращает int, как этого требует пункт g. 
+print(isinstance(machine.getCoins2(), int))
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def giveProduct2(self, number: int):
+    ...
+    if res % self.__coinval2 == 0:
+        self.__coins2 -= res // self.__coinval2
+        self.__balance = 0
+        self.__num2 -= number
+        return VendingMachine.Response.OK
+    ...
+```
