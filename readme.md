@@ -61,103 +61,8 @@ def getCoins2(self):
 
 
 
+
 ### Ошибка #2
-
-**Код до исправления**  
-```python
-def putCoin1(self):
-    if self.__mode == VendingMachine.Mode.ADMINISTERING:
-        return VendingMachine.Response.ILLEGAL_OPERATION
-    if self.__coins2 == self.__maxc2:
-        return VendingMachine.Response.CANNOT_PERFORM
-    self.__balance += self.__coinval2
-    self.__coins2 += 1
-    return VendingMachine.Response.OK
-```
-
-**Данные, на которых наблюдается некорректное поведение**  
-Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins2 != self.__maxc2`, то метод не увеличит количество 1-го вида монет в автомате, хотя пункт o. требует этого. Это проверяется методом `getCoins1()`, который пункт f. требует возвращать количество монет 1-го вида вне режима отладки.
-
-**Шаги для воспроизведения**
-```python
-machine = VendingMachine()
-print(machine.getCoins1(), end=" ")
-machine.putCoin1()
-print(machine.getCoins1())
-```
-Заметим, что воспроизведение не зависит от начального значения количества монет 1-го вида в автомате, которое по принципу "серого ящика" мы можем и не знать.
-
-**Полученное значение**  
-В `stdout` выведется `0 0`.
-
-**Ожидаемое значение**  
-В `stdout` должно вывестись `0 1`.
-
-**Код после исправления**  
-```python
-def putCoin1(self):
-    if self.__mode == VendingMachine.Mode.ADMINISTERING:
-        return VendingMachine.Response.ILLEGAL_OPERATION
-    if self.__coins2 == self.__maxc2:
-        return VendingMachine.Response.CANNOT_PERFORM
-    self.__balance += self.__coinval2
-    self.__coins1 += 1
-    return VendingMachine.Response.OK
-```
-
-
-
-
-
-
-
-### Ошибка #3
-
-**Код до исправления**  
-```python
-def getCoins2(self):
-    if self.__mode == VendingMachine.Mode.OPERATION:
-        return self.__coins1
-    return self.__coins2
-```
-
-**Данные, на которых наблюдается некорректное поведение**  
-Если `self.__mode == VendingMachine.Mode.OPERATION`, то метод вернет количество монет 1-го вида, хотя пункт g. требует вернуть `0`.
-
-**Шаги для воспроизведения**
-```python
-machine = VendingMachine()
-# Кладя монету 1-го вида в автомат, мы удостоверяемся, что монет 1-го вида не может быть ноль,
-# а, соответственно, мы можем различить ситуации, когда количество монет 1-го вида равно нулю
-# (и по "воле случая" возвращается правильный ответ), и когда буквально возвращается ноль.
-machine.putCoin1() 
-print(machine.getCoins2())
-```
-
-**Полученное значение**  
-В `stdout` выведется `1`.
-
-**Ожидаемое значение**  
-В `stdout` должно вывестись `0`.
-
-**Код после исправления**  
-```python
-def getCoins2(self):
-    if self.__mode == VendingMachine.Mode.OPERATION:
-        return 0
-    return self.__coins2
-```
-
-
-
-
-
-
-
-
-
-
-### Ошибка #4
 
 **Код до исправления**  
 ```python
@@ -216,7 +121,7 @@ def enterAdminMode(self, code: int):
 
 
 
-### Ошибка #5
+### Ошибка #3
 
 **Код до исправления**  
 ```python
@@ -268,6 +173,107 @@ def enterAdminMode(self, code: int):
 
 
 
+### Ошибка #4
+
+**Код до исправления**  
+```python
+def putCoin1(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins2 == self.__maxc2:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval2
+    self.__coins2 += 1
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins2 != self.__maxc2`, то метод не увеличит количество 1-го вида монет в автомате, хотя пункт o. требует этого. Это проверяется методом `getCoins1()`, который пункт f. требует возвращать количество монет 1-го вида вне режима отладки.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Внесем одну монету 1-го типа.
+machine.putCoin1()
+# Попытаемся вернуть деньги.
+# Будем условиться, что мы знаем реализацию putCoin1() и баги в ней.
+# То есть, мы знаем, что сейчас на балансе 2 у.е., но, в теории,
+# внесена только одна монета 1-го типа.
+# Таким образом, ожидаетсЯ, что вернется TOO_BIG_CHANGE (что неверно).
+print(machine.returnMoney() == VendingMachine.Response.TOO_BIG_CHANGE)
+```
+
+**Полученное значение**  
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def putCoin1(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins2 == self.__maxc2:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval2
+    self.__coins1 += 1
+    return VendingMachine.Response.OK
+```
+
+
+
+
+
+
+
+### Ошибка #5
+
+**Код до исправления**  
+```python
+def getCoins2(self):
+    if self.__mode == VendingMachine.Mode.OPERATION:
+        return self.__coins1
+    return self.__coins2
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode == VendingMachine.Mode.OPERATION`, то метод вернет количество монет 1-го вида, хотя пункт g. требует вернуть `0`.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Кладя монету 1-го вида в автомат, мы удостоверяемся, что монет 1-го вида не может быть ноль,
+# а, соответственно, мы можем различить ситуации, когда количество монет 1-го вида равно нулю
+# (и по "воле случая" возвращается правильный ответ), и когда буквально возвращается ноль.
+machine.putCoin1() 
+print(machine.getCoins2())
+```
+
+**Полученное значение**  
+В `stdout` выведется `1`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `0`.
+
+**Код после исправления**  
+```python
+def getCoins2(self):
+    if self.__mode == VendingMachine.Mode.OPERATION:
+        return 0
+    return self.__coins2
+```
+
+
+
+
+
+
+
+
+
+
+
 ### Ошибка #6
 
 **Код до исправления**  
@@ -289,7 +295,6 @@ machine.exitAdminMode()
 # Ожидается, что вернется VendingMachine.Response.ILLEGAL_OPERATION.
 print(machine.fillProducts() == VendingMachine.Response.ILLEGAL_OPERATION)
 ```
-Заметим, что мы используем метод `enterAdminMode(code)` для тестирования других методов только после того как нашли в нем все ошибки.
 
 **Полученное значение**  
 В `stdout` выведется `False`.
@@ -809,4 +814,48 @@ def putCoin1(self):
     self.__balance += self.__coinval1
     self.__coins1 += 1
     return VendingMachine.Response.OK
+```
+
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #15
+
+**Код до исправления**  
+```python
+def putCoin2(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins1 == self.__maxc1:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval1
+    self.__coins1 += 1
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins1 != self.__maxc1`, то при внесении монеты 2-го типа в автомат, метод `putCoin2()` не увеличит количество монет 2-го типа на 1, хотя этого требует пункт p.
+
+**Шаги для воспроизведения**
+```python
+
+```
+
+**Полученное значение**   
+
+
+**Ожидаемое значение**  
+
+
+**Код после исправления**  
+```python
+
 ```
