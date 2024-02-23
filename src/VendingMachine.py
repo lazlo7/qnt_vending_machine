@@ -121,7 +121,7 @@ class VendingMachine:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if self.__coins1 == self.__maxc1:
             return VendingMachine.Response.CANNOT_PERFORM
-        self.__balance += self.__coinval1
+        self.__balance += self.__coinval2
         self.__coins2 += 1
         return VendingMachine.Response.OK
 

@@ -875,3 +875,85 @@ def putCoin2(self):
     self.__coins2 += 1
     return VendingMachine.Response.OK
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #16
+
+**Код до исправления**  
+```python
+def putCoin2(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins1 == self.__maxc1:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval1
+    self.__coins2 += 1
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins1 != self.__maxc1`, то при внесении монеты 2-го типа в автомат, метод `putCoin2()` увеличит баланс на стоимость монеты 1-го типа, а не 2-го типа, как этого требует пункт p.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Перейдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Результат getCurrentSum() задается выражением:
+# coins1 * coinval1 + coins2 * coinval2
+# Это означает, что мы можем составить систему из 2-ух уравнений
+# и решить ее, чтобы найти эталонные значения coinval1 и coinval2.
+# Составим 1-ое уравнение: v1 + v2 = s1.
+machine.fillCoins(1, 1)
+s1 = machine.getCurrentSum()
+# Составим 2-ое уравнение.
+# Возьмем такие c1 и c2, чтобы 2-ое уравнение не вырождалось в 1-ое:
+# 2v1 + 3v2 = s2.
+machine.fillCoins(2, 3)
+s2 = machine.getCurrentSum()
+# Из 1-ого уравнения следует, что v1 = s1 - v2.
+# Заменив v1 этим равенством и упростив уравнение, получаем:
+# v2 = s2 - 2s1.
+coinval2 = s2 - 2*s1
+# Перейдем в рабочий режим.
+machine.exitAdminMode()
+# Запомним изначальный баланс.
+old_balance = machine.getCurrentBalance()
+# Внесем одну монету 1-го типа на баланс.
+machine.putCoin2()
+# Вычислим новый баланс, получившийся в результате putCoin2().
+new_balance = machine.getCurrentBalance()
+# Таким образом, дельта баланса - используемый в putCoin2() coinval2.
+got_coinval2 = new_balance - old_balance
+# Ожидается, что coinval2 == got_coinval2.
+print(coinval2 == got_coinval2)
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def putCoin2(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins1 == self.__maxc1:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval2
+    self.__coins2 += 1
+    return VendingMachine.Response.OK
+```
+
