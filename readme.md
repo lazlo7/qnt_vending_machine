@@ -1161,3 +1161,64 @@ def giveProduct1(self, number: int):
         return VendingMachine.Response.OK
     ...
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #20
+
+**Код до исправления**  
+```python
+def giveProduct2(self, number: int):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if number <= 0 or number >= self.__max2:
+        return VendingMachine.Response.INVALID_PARAM
+    if number > self.__num2:
+        return VendingMachine.Response.INSUFFICIENT_PRODUCT
+    ...
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number > 0 and number == self.__max2`, то метод `giveProduct2()` вернет `VendingMachine.Response.INVALID_PARAM`, хотя пункт s. требует возвращать `VendingMachine.Response.INVALID_PARAM` только если `number` \<= 0 предметов или больше максимума предметов 2-го вида (т. е. выполнение метода должно продолжаться).
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Зайдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Вычислим максимальное количество продуктов 2-го типа.
+machine.fillProducts()
+max2 = machine.getNumberOfProduct2()
+# Выйдем из режима отладки.
+machine.exitAdminMode()
+# Попытаемся купить все продукты 2-го типа.
+# Ожидается, что не возвратится VendingMachine.Response.INVALID_PARAM.
+print(machine.giveProduct2(max2) == VendingMachine.Response.INVALID_PARAM)
+```
+
+**Полученное значение**  
+В `stdout` выведется `True`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `False`.
+
+**Код после исправления**  
+```python
+def giveProduct2(self, number: int):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if number <= 0 or number > self.__max2:
+        return VendingMachine.Response.INVALID_PARAM
+    if number > self.__num2:
+        return VendingMachine.Response.INSUFFICIENT_PRODUCT
+    ...
+```
