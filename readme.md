@@ -1140,7 +1140,7 @@ while machine.getCurrentBalance() < price1:
 machine.giveProduct1(1)
 # Зайдем в режим отладки.
 machine.enterAdminMode(117345294655382)
-# Проверим, что метод getCoins() возвращает int, как этого требует пункт g. 
+# Проверим, что метод getCoins2() возвращает int, как этого требует пункт g. 
 print(isinstance(machine.getCoins2(), int))
 ```
 
