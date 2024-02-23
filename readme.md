@@ -725,7 +725,7 @@ old_balance = machine.getCurrentBalance()
 machine.putCoin1()
 # Вычислим новый баланс, получившийся в результате putCoin1().
 new_balance = machine.getCurrentBalance()
-# Таким образом, дельта баланса - используемый в fillCoins() coinval1.
+# Таким образом, дельта баланса - используемый в putCoin1() coinval1.
 got_coinval1 = new_balance - old_balance
 # Ожидается, что coinval1 == got_coinval1.
 print(coinval1 == got_coinval1)
