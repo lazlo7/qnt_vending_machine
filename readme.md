@@ -1118,7 +1118,7 @@ def giveProduct1(self, number: int):
 ```
 
 **Данные, на которых наблюдается некорректное поведение**  
-Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number == 1 and res >= 0 and res <= self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2 and res <= self.__coins2 * self.__coinval2 and res % self.__coinval2 == 0`, то метод `giveProduct1()` уменьшит количество монет 2-го типа на `res / self.__coinval2`, что сделает `self.__coins1` нецелым, приводя к тому, что метод `getCoins2()` возвратит число с плавающей точкой, хотя пункт g. требует возвратить целое число.
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number == 1 and res >= 0 and res <= self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2 and res <= self.__coins2 * self.__coinval2 and res % self.__coinval2 == 0`, то метод `giveProduct1()` уменьшит количество монет 2-го типа на `res / self.__coinval2`, что сделает `self.__coins2` нецелым, приводя к тому, что метод `getCoins2()` возвратит число с плавающей точкой, хотя пункт g. требует возвратить целое число.
 
 **Шаги для воспроизведения**
 ```python
