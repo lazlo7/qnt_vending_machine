@@ -211,8 +211,8 @@ class VendingMachine:
             return VendingMachine.Response.OK
         if self.__coins1 == 0:
             return VendingMachine.Response.UNSUITABLE_CHANGE
-        self.__coins1 -= res // self.__coinval2
-        self.__coins2 -= 1
+        self.__coins2 -= res // self.__coinval2 # [fixed] both this line and line below.
+        self.__coins1 -= 1
         self.__balance = 0
         self.__num2 -= number
         return VendingMachine.Response.OK

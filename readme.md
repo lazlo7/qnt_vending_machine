@@ -1289,3 +1289,78 @@ def giveProduct2(self, number: int):
         return VendingMachine.Response.OK
     ...
 ```
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #22
+
+**Код до исправления**  
+```python
+def giveProduct2(self, number: int):
+    ...
+    self.__coins1 -= res // self.__coinval2
+    self.__coins2 -= 1
+    self.__balance = 0
+    self.__num2 -= number
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and number == 1 and res >= 0 and res <= self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2 and res <= self.__coins2 * self.__coinval2 and res % self.__coinval2 != 0 and self.__coins1 != 0`, то метод `giveProduct2()` уменьшит количество монет 1-го типа на `res // self.__coinval2` и 2-го типа на `1`, что приведет к выдаче неправильной сдачи, что нарушает требование s.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Перейдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Заполним автомат продуктами.
+machine.fillProducts()
+# Установим минимальные цены на продукты.
+machine.setPrices(1, 1)
+# Выйдем из режима отладки.
+machine.exitAdminMode()
+# Внесем 3 монеты 2-го типа и 1 монету 1-го типа.
+machine.putCoin2()
+machine.putCoin2()
+machine.putCoin2()
+machine.putCoin1()
+# Попробуем взять продукт 2 продукта 1-го типа.
+# - mode != ADMINISTERING
+# - number = 2 (условимся, что max2 > 2)
+# - res >= 0 <=> balance - number * price >= 0 <=> 7 - 2 * 1 >= 0 <=> 5 >= 0
+# - res <= coins1 * coinval1 + coins2 * coinval2 <=> 5 <= 1 * 1 + 3 * 2 <=> 5 <= 7
+# - res <= coins2 * coinval2 <=> 5 > 3 * 2 <=> 5 <= 6
+# - res % 2 != 0 <=> 5 % 2 != 0 <=> 1 != 0
+# - coins1 != 0
+# Таким образом, должен выполнится последний случай, описанный в требовании s. 
+machine.giveProduct2(2)
+# Перейдем в режим отладки.
+machine.enterAdminMode(117345294655382)
+# Ожидается, что вернется 1 и 0.
+print(machine.getCoins1() == 0 and machine.getCoins2() == 1)
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def giveProduct2(self, number: int):
+    ...
+    self.__coins2 -= res // self.__coinval2
+    self.__coins1 -= 1
+    self.__balance = 0
+    self.__num2 -= number
+    return VendingMachine.Response.OK
+```
