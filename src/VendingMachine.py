@@ -172,7 +172,7 @@ class VendingMachine:
             self.__num1 -= number
             return VendingMachine.Response.OK
         if res % self.__coinval2 == 0:
-            self.__coins2 -= res / self.__coinval2
+            self.__coins2 -= res // self.__coinval2
             self.__balance = 0
             self.__num1 -= number
             return VendingMachine.Response.OK
