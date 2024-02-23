@@ -119,7 +119,7 @@ class VendingMachine:
     def putCoin2(self):
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
-        if self.__coins1 == self.__maxc1:
+        if self.__coins2 == self.__maxc2: # [fixed].
             return VendingMachine.Response.CANNOT_PERFORM
         self.__balance += self.__coinval2 # [fixed].
         self.__coins2 += 1 # [fixed].

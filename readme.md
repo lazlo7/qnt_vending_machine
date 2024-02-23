@@ -957,3 +957,65 @@ def putCoin2(self):
     return VendingMachine.Response.OK
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+### Ошибка #17
+
+**Код до исправления**  
+```python
+def putCoin2(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins1 == self.__maxc1:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval2
+    self.__coins2 += 1
+    return VendingMachine.Response.OK
+```
+
+**Данные, на которых наблюдается некорректное поведение**  
+Если `self.__mode != VendingMachine.Mode.ADMINISTERING and self.__coins2 >= self.__maxc2`, то при внесении еще одной монеты 2-го типа в автомат, метод `putCoin2()` не возвратит `VendingMachine.Response.CANNOT_PERFORM`, хотя этого требует пункт p.
+
+**Шаги для воспроизведения**
+```python
+machine = VendingMachine()
+# Перейдем в режим отладки
+machine.enterAdminMode(117345294655382)
+# Вычислим эталонное значение maxc2.
+maxc2 = 0
+while machine.fillCoins(1, maxc2 + 1) != VendingMachine.Response.INVALID_PARAM:
+    maxc2 += 1
+# Удостоверимся, что в автомат внесено максимальное количество монет 2-го типа.
+machine.fillCoins(1, maxc2)
+# Перейдем в рабочий режим.
+machine.exitAdminMode()
+# Попытаемся внести монету 2-го типа. Исходя из требований, должно вернуться CANNOT_PERFORM.
+print(machine.putCoin2() == VendingMachine.Response.CANNOT_PERFORM)
+```
+
+**Полученное значение**   
+В `stdout` выведется `False`.
+
+**Ожидаемое значение**  
+В `stdout` должно вывестись `True`.
+
+**Код после исправления**  
+```python
+def putCoin2(self):
+    if self.__mode == VendingMachine.Mode.ADMINISTERING:
+        return VendingMachine.Response.ILLEGAL_OPERATION
+    if self.__coins2 == self.__maxc2:
+        return VendingMachine.Response.CANNOT_PERFORM
+    self.__balance += self.__coinval2
+    self.__coins2 += 1
+    return VendingMachine.Response.OK
+```
