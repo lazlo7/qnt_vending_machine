@@ -87,13 +87,13 @@ class VendingMachine:
         self.__coins2 = c2
         return VendingMachine.Response.OK
 
-    def enterAdminMode(self, code: int): # [done].
+    def enterAdminMode(self, code: int): # [done] [covered].
         if code != self.__id:
-            return VendingMachine.Response.INVALID_PARAM # [fixed] (first must return invalid_param if codes don't match).
+            return VendingMachine.Response.INVALID_PARAM # [fixed] (first must return invalid_param if codes don't match) [covered].
         if self.__balance != 0:
-            return VendingMachine.Response.CANNOT_PERFORM # [fixed].
+            return VendingMachine.Response.CANNOT_PERFORM # [fixed] [covered].
         self.__mode = VendingMachine.Mode.ADMINISTERING
-        return VendingMachine.Response.OK
+        return VendingMachine.Response.OK # [covered].
 
     def exitAdminMode(self): # [done].
         self.__mode = VendingMachine.Mode.OPERATION
