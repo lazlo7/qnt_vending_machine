@@ -4,6 +4,10 @@
 # Ignore .vscode
 .vscode
 
+# Ignore everything in coverage, except for the .gitkeep file
+coverage/
+!coverage/.gitkeep
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
