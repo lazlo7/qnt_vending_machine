@@ -81,7 +81,7 @@ class VendingMachine:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if c1 <= 0 or c1 > self.__maxc1: # [fixed].
             return VendingMachine.Response.INVALID_PARAM
-        if c2 <= 0 or c2 > self.__maxc2: # [fixed].
+        if c2 <= 0 or c2 > self.__maxc2: # [fixed] [unreachable].
             return VendingMachine.Response.INVALID_PARAM
         self.__coins1 = c1
         self.__coins2 = c2
@@ -131,7 +131,7 @@ class VendingMachine:
         if self.__balance == 0:
             return VendingMachine.Response.OK
         if self.__balance > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2: 
-            return VendingMachine.Response.TOO_BIG_CHANGE # [unreachable: prove].
+            return VendingMachine.Response.TOO_BIG_CHANGE # [unreachable].
         if self.__balance > self.__coins2 * self.__coinval2:
             # using coinval1 == 1
             self.__coins1 -= self.__balance - self.__coins2 * self.__coinval2
@@ -163,7 +163,7 @@ class VendingMachine:
         if res < 0:
             return VendingMachine.Response.INSUFFICIENT_MONEY
         if res > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
-            return VendingMachine.Response.TOO_BIG_CHANGE # [unreachable: prove].
+            return VendingMachine.Response.TOO_BIG_CHANGE # [unreachable].
         if res > self.__coins2 * self.__coinval2:
             # using coinval1 == 1
             self.__coins1 -= res - self.__coins2 * self.__coinval2
@@ -196,7 +196,7 @@ class VendingMachine:
         if res < 0:
             return VendingMachine.Response.INSUFFICIENT_MONEY
         if res > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
-            return VendingMachine.Response.INSUFFICIENT_MONEY # [unreachable: prove].
+            return VendingMachine.Response.INSUFFICIENT_MONEY # [unreachable].
         if res > self.__coins2 * self.__coinval2:
             # using coinval1 == 1
             self.__coins1 -= res - self.__coins2 * self.__coinval2

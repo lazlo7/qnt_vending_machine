@@ -1364,3 +1364,108 @@ def giveProduct2(self, number: int):
     self.__num2 -= number
     return VendingMachine.Response.OK
 ```
+
+
+
+
+
+
+
+
+## Недостижимый код
+
+### Недостижимый код #1
+
+```python
+def returnMoney(self):
+    ...
+if self.__balance > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2: 
+    return VendingMachine.Response.TOO_BIG_CHANGE # Unreachable.
+    ...
+```
+
+Условие выше никогда не выполнится. Попробуем набросить доказательство.  
+Чтобы условие выполнилось, надо как-то достичь одну из следующих ситуаций:
+- увеличить баланс, не увеличивая количество монет 1-го и 2-го типа (1);
+- уменьшить количество монет 1-го и 2-го типа, не уменьшая баланс (2).
+  
+Увеличить баланс можно только через методы `putCoin1()` и `putCoin2()`, но в обоих из них при увеличении баланса увеличивается и соответствующее количество монет, поэтому первая ситуация не выполняется.  
+  
+Уменьшение количества монеты 1-го или 2-го типа (оператор `-=`) встречается только в методах `returnMoney()`, `giveProduct1()`, `giveProduct2()`, однако там же баланс обнуляется.  
+Уменьшения также можно добиться и с помощью оператора присваивания (`=`). К `__coins1` значение присваивается только 1 раз в методе `fillCoins()` (не считая конструктора); к `__coins2` там тоже присваивается значение. Однако, как для `__coins1`, так и `__coins2`, метод `fillCoins()` работает только в режиме отладки, в которой можно перейти только через метод `enterAdminMode()`, который работает только если баланс нулевой. Иными словами, мы не можем внести что-то на баланс через `putCoin1()` или `putCoin2()` и потом уменьшить `__coins1` или `__coins2`, так как не сможем зайти в режим отладки.  
+К `__coins2` также можно присвоить значение в методах `returnMoney()`, `giveProduct1()`, `giveProduct2()`. Тем не менее, во всех случаях баланс там же обнуляется.  
+  
+Итого, не представляется возможным осуществить ситуацию 1 или 2, что говорит о том, что условие никогда не выполнится.
+
+
+
+
+
+
+
+
+
+
+
+### Недостижимый код #2
+
+```python
+def giveProduct1(self, number: int):
+    ...
+    if res > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
+        return VendingMachine.Response.TOO_BIG_CHANGE # Unreachable.
+    ...
+```
+
+`res` вычисляется как `self.__balance - number * self.__price1`, а это означает, что `res < self.__balance` (по условию `number` и `self.__price1` больше нуля).  
+Далее доказывается аналогично пункту 1.
+
+
+
+
+
+
+
+
+
+
+
+
+### Недостижимый код #3
+
+```python
+def giveProduct2(self, number: int):
+    ...
+    if res > self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2:
+        return VendingMachine.Response.INSUFFICIENT_MONEY # Unreachable.
+    ...
+```
+
+Доказывается аналогично пункту 2.  
+Замечание. Пункт s. требует возвращать `VendingMachine.Response.TOO_BIG_CHANGE`, а не `VendingMachine.Response.INSUFFICIENT_MONEY`, но т. к. код недостижим, то это не имеет значения.
+
+
+
+
+
+
+
+
+
+
+
+### Недостижимый код #4
+
+```python
+def fillCoins(self, c1: int, c2: int):
+    ...
+    if c1 <= 0 or c2 > self.__maxc1:
+            return VendingMachine.Response.INVALID_PARAM
+    if c1 <= 0 or c2 > self.__maxc2:
+        return VendingMachine.Response.INVALID_PARAM # Unreachable.
+    ...
+```
+
+Из оригинальной версии VendingMachine.  
+Чтобы попасть во второе условие нужно иметь `c1 <= 0` (отлавливается 1-ым условием) или `c2 > self.__maxc2` (так как `self.__maxc1` равен `self.__maxc2`, то тоже отлавливается 1-ым условием).  
+Таким образом, второе условие никогда не выполнится.
