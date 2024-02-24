@@ -95,7 +95,7 @@ class VendingMachine:
         self.__mode = VendingMachine.Mode.ADMINISTERING
         return VendingMachine.Response.OK # [covered].
 
-    def exitAdminMode(self): # [done].
+    def exitAdminMode(self): # [done] [covered].
         self.__mode = VendingMachine.Mode.OPERATION
 
     def setPrices(self, p1: int, p2: int): # [done].

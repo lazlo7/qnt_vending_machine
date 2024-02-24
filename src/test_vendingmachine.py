@@ -64,4 +64,13 @@ def test_getNumberOfProduct1():
 """
 exitAdminMode() tests.
 """
+def test_exitAdminMode_AfterAdminMode():
+    machine = VendingMachine()
+    machine.enterAdminMode(ADMIN_CODE)
+    machine.exitAdminMode()
+    assert machine.getCurrentMode() == VendingMachine.Mode.OPERATION
 
+def test_exitAdminMode_AfterOperationMode():
+    machine = VendingMachine()
+    machine.exitAdminMode()
+    assert machine.getCurrentMode() == VendingMachine.Mode.OPERATION
