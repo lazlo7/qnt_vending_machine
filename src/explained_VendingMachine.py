@@ -36,51 +36,51 @@ class VendingMachine:
         self.__coins2 = 0
         self.__balance = 0 # Current balance (during one user-session).
 
-    def getNumberOfProduct1(self): # Simple getter [+] [done].
+    def getNumberOfProduct1(self): # Simple getter [+] [done] [covered].
         return self.__num1
 
-    def getNumberOfProduct2(self): # Simple getter [+] [done].
+    def getNumberOfProduct2(self): # Simple getter [+] [done] [covered].
         return self.__num2
 
-    def getCurrentBalance(self): # Simple getter [+] [done].
+    def getCurrentBalance(self): # Simple getter [+] [done] [covered].
         return self.__balance
 
-    def getCurrentMode(self): # Simple getter [+] [done].
+    def getCurrentMode(self): # Simple getter [+] [done] [covered].
         return self.__mode
 
-    def getCurrentSum(self): # [+] [done].
+    def getCurrentSum(self): # [+] [done] [covered].
         if self.__mode == VendingMachine.Mode.OPERATION:
             return 0
         return self.__coins1 * self.__coinval1 + self.__coins2 * self.__coinval2
 
-    def getCoins1(self): # [+] [done].
+    def getCoins1(self): # [+] [done] [covered].
         if self.__mode == VendingMachine.Mode.OPERATION:
             return 0 
         return self.__coins1
 
-    def getCoins2(self): # [+] [done].
+    def getCoins2(self): # [+] [done] [covered].
         if self.__mode == VendingMachine.Mode.OPERATION:
             return 0 # [fixed typo] [fixed].
         return self.__coins2
 
-    def getPrice1(self): # Simple getter [+] [done].
+    def getPrice1(self): # Simple getter [+] [done] [covered].
         return self.__price1
 
-    def getPrice2(self): # Simple getter [+] [done].
+    def getPrice2(self): # Simple getter [+] [done] [covered].
         return self.__price2
 
-    def fillProducts(self):
+    def fillProducts(self): # [covered].
         if self.__mode != VendingMachine.Mode.ADMINISTERING: # [fixed] [done].
             return VendingMachine.Response.ILLEGAL_OPERATION
         self.__num1 = self.__max1 # [fixed].
         self.__num2 = self.__max2
         return VendingMachine.Response.OK
 
-    def fillCoins(self, c1: int, c2: int): # [done].
+    def fillCoins(self, c1: int, c2: int): # [done] [covered].
         if self.__mode == VendingMachine.Mode.OPERATION:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if c1 <= 0 or c1 > self.__maxc1: # [fixed].
-            return VendingMachine.Response.INVALID_PARAM
+            return VendingMachine.Response.INVALID_PARAM 
         if c2 <= 0 or c2 > self.__maxc2: # [fixed] [unreachable].
             return VendingMachine.Response.INVALID_PARAM
         self.__coins1 = c1
@@ -98,16 +98,16 @@ class VendingMachine:
     def exitAdminMode(self): # [done] [covered].
         self.__mode = VendingMachine.Mode.OPERATION
 
-    def setPrices(self, p1: int, p2: int): # [done].
+    def setPrices(self, p1: int, p2: int): # [done] [covered].
         if self.__mode == VendingMachine.Mode.OPERATION:
-            return VendingMachine.Response.ILLEGAL_OPERATION
+            return VendingMachine.Response.ILLEGAL_OPERATION # [covered].
         if p1 <= 0 or p2 <= 0: # [fixed] [fixed]. 
-            return VendingMachine.Response.INVALID_PARAM
-        self.__price1 = p1
+            return VendingMachine.Response.INVALID_PARAM # [covered] both p1 <= 0 or p2 <= 0.
+        self.__price1 = p1 # [covered] both this line and 2 lines below.
         self.__price2 = p2
         return VendingMachine.Response.OK
 
-    def putCoin1(self): # [done].
+    def putCoin1(self): # [done] [covered].
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if self.__coins1 == self.__maxc1: # [fixed].
@@ -116,7 +116,7 @@ class VendingMachine:
         self.__coins1 += 1 # [fixed].
         return VendingMachine.Response.OK
 
-    def putCoin2(self): # [done].
+    def putCoin2(self): # [done] [covered].
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if self.__coins2 == self.__maxc2: # [fixed].
@@ -125,7 +125,7 @@ class VendingMachine:
         self.__coins2 += 1 # [fixed].
         return VendingMachine.Response.OK
 
-    def returnMoney(self): # [done].
+    def returnMoney(self): # [done] [covered].
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if self.__balance == 0:
@@ -144,14 +144,14 @@ class VendingMachine:
             return VendingMachine.Response.OK
         if self.__coins1 == 0:
             # using coinval1 == 1
-            return VendingMachine.Response.UNSUITABLE_CHANGE
+            return VendingMachine.Response.UNSUITABLE_CHANGE # [unreachable].
         # using coinval1 == 1
         self.__coins2 -= self.__balance // self.__coinval2 # [fixed] both this line and next line.
         self.__coins1 -= 1         
         self.__balance = 0
         return VendingMachine.Response.OK
 
-    def giveProduct1(self, number: int): # [done].
+    def giveProduct1(self, number: int): # [done] [covered].
         if self.__mode == VendingMachine.Mode.ADMINISTERING:
             return VendingMachine.Response.ILLEGAL_OPERATION
         if number <= 0 or number > self.__max1: # [fixed].
